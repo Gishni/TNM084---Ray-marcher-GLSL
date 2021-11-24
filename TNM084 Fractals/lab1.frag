@@ -10,7 +10,6 @@ in vec2 texCoord;
 uniform sampler2D tex;
 
 uniform int displayGPUversion;
-uniform float ringDensity;
 uniform int iterations;
 
 

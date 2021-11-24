@@ -6,8 +6,11 @@ in  vec4 in_Position;
 in vec2 in_TexCoord;
 out vec2 texCoord;
 
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
 void main(void)
 {
 	texCoord = in_TexCoord;
-	gl_Position = in_Position;
+	gl_Position =  projectionMatrix*viewMatrix*in_Position;
 }

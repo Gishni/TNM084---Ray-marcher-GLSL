@@ -6,7 +6,7 @@
 #include "GL_utilities.h"
 #include <Math.h>
 #include <stdio.h>
-
+#include "VectorUtils3.h"
 
 
 
@@ -60,20 +60,36 @@ GLfloat texCoords[] = { 0.0f,0.0f,
 						1.0f,1.0f,
 						1.0f,0.0f };
 
+mat4 projectionMatrix;
 // vertex array object
 unsigned int vertexArrayObjID;
 // Texture reference
 GLuint texid;
 // Switch between CPU and shader generation
-int displayGPUversion = 0;
+int displayGPUversion = 1;
 	// Reference to shader program
 	GLuint program;
+
+
+//TAKEN FROM LAB 3
+void reshape(int w, int h)
+{
+    glViewport(0, 0, w, h);
+
+	// Set the clipping volume
+	projectionMatrix = perspective(45,1.0f*w/h,1,1000);
+	glUniformMatrix4fv(glGetUniformLocation(program, "projectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
+}
+
 
 void init(void)
 {
 	// two vertex buffer objects, used for uploading the
 	unsigned int vertexBufferObjID;
 	unsigned int texBufferObjID;
+
+    projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 300.0);
+
 
 	// GL inits
 	glClearColor(0.2,0.2,0.5,0);
@@ -107,12 +123,13 @@ void init(void)
 	glVertexAttribPointer(glGetAttribLocation(program, "in_TexCoord"), 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(glGetAttribLocation(program, "in_TexCoord"));
 
+    //TEST
+    glUniformMatrix4fv(glGetUniformLocation(program, "projectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	// Texture unit
 	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
 
 // Constants common to CPU and GPU
-	glUniform1i(glGetUniformLocation(program, "displayGPUversion"), 0); // shader generation off
-	glUniform1f(glGetUniformLocation(program, "ringDensity"), ringDensity);
+	glUniform1i(glGetUniformLocation(program, "displayGPUversion"), 1); // shader generation off
 	glUniform1i(glGetUniformLocation(program, "iterations"), iterations);
 
 	maketexture();
@@ -130,30 +147,80 @@ void init(void)
 	printError("init arrays");
 }
 
-// Switch on any key
-void key(unsigned char key, int x, int y)
-{
-	displayGPUversion = !displayGPUversion;
-	glUniform1i(glGetUniformLocation(program, "displayGPUversion"), displayGPUversion); // shader generation off
-	printf("Changed flag to %d\n", displayGPUversion);
-	glutPostRedisplay();
-}
+
+GLfloat a = 0.0;
+vec3 campos = {0, 1.5, 10};
+vec3 forward = {0, 0, -4};
+vec3 up = {0, 1, 0};
 
 void display(void)
 {
 	printError("pre display");
-
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	mat4 worldToView, m;
+
+    worldToView = lookAtv(campos, VectorAdd(campos, forward), up);
+    a+= 0.1;
+    m = worldToView;
+    glUniformMatrix4fv(glGetUniformLocation(program, "viewMatrix"), 1, GL_TRUE, m.m);
+
+
 
     iterations++;
     glUniform1i(glGetUniformLocation(program, "iterations"), iterations);
 	glBindVertexArray(vertexArrayObjID);	// Select VAO
 	glDrawArrays(GL_TRIANGLES, 0, 6);	// draw object
 	printError("display");
-    printf("%d", iterations);
 
 	glutSwapBuffers();
+}
+
+// Switch on any key
+void keys(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+		case ' ':
+			forward.y = 0;
+			forward = ScalarMult(normalize(forward), 4.0);
+			break;
+
+        case'w':
+            campos = VectorAdd(campos, ScalarMult(forward, 0.1));
+            break;
+
+        case'a':
+            forward = MultMat3Vec3(mat4tomat3(Ry(0.05)), forward);
+            break;
+
+        case's':
+            campos = VectorSub(campos, ScalarMult(forward, 0.1));
+            break;
+
+        case'd':
+            forward = MultMat3Vec3(mat4tomat3(Ry(-0.05)), forward);
+            break;
+
+        case'q':
+            campos = VectorSub(campos, ScalarMult(CrossProduct(forward, SetVector(0,1,0)), 0.05));
+            break;
+
+        case'e':
+            campos = VectorAdd(campos, ScalarMult(CrossProduct(forward, SetVector(0,1,0)), 0.05));
+            break;
+
+        case'z':
+            campos = VectorAdd(campos, ScalarMult(SetVector(0,1,0), 0.01));
+            break;
+
+        case'c':
+            campos = VectorSub(campos, ScalarMult(SetVector(0,1,0), 0.01));
+            break;
+
+	}
+	glutPostRedisplay();
 }
 
 int main(int argc, char *argv[])
@@ -163,7 +230,7 @@ int main(int argc, char *argv[])
 	glutInitWindowSize(kTextureSize, kTextureSize);
 	glutCreateWindow ("Lab 1");
 	glutDisplayFunc(display);
-	glutKeyboardFunc(key);
+	glutKeyboardFunc(keys);
 	//glutRepeatingTimer(1000);
 	init ();
 	glutMainLoop();
