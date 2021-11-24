@@ -60,6 +60,10 @@ GLfloat texCoords[] = { 0.0f,0.0f,
 						1.0f,1.0f,
 						1.0f,0.0f };
 
+mat4 matID = {            -1.0f,-1.0f,0.0f,1.0f,
+						-1.0f,1.0f,0.0f,1.0f,
+						1.0f,1.0f,0.0f,1.0f,
+						1.0f,-1.0f,0.0f,1.0f };
 mat4 projectionMatrix;
 // vertex array object
 unsigned int vertexArrayObjID;
@@ -124,6 +128,7 @@ void init(void)
 	glEnableVertexAttribArray(glGetAttribLocation(program, "in_TexCoord"));
 
     //TEST
+    glUniformMatrix4fv(glGetUniformLocation(program, "mat"), 1, GL_TRUE, matID.m);
     glUniformMatrix4fv(glGetUniformLocation(program, "projectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	// Texture unit
 	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
@@ -131,6 +136,7 @@ void init(void)
 // Constants common to CPU and GPU
 	glUniform1i(glGetUniformLocation(program, "displayGPUversion"), 1); // shader generation off
 	glUniform1i(glGetUniformLocation(program, "iterations"), iterations);
+
 
 	maketexture();
 

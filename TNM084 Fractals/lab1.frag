@@ -11,7 +11,9 @@ uniform sampler2D tex;
 
 uniform int displayGPUversion;
 uniform int iterations;
-
+uniform mat4 mat;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
 
 vec2 random2(vec2 st)
 {
@@ -52,10 +54,21 @@ float DE(vec4 pos){
     return 0.5*log(r)*r/dr;
 }
 
-float rayMarch (inout vec4 position, vec4 direction){
+//TAKEN FROM http://celarek.at/wp/wp-content/uploads/2014/05/realTimeFractalsReport.pdf
+vec4 calculateNormal (vec4 position){
+    float e = 0.0000001;
+    float n = DE(position);
+    float dx = DE(position + vec4(e, 0,0,0)) - n;
+    float dy = DE(position + vec4(0, e,0,0)) - n;
+    float dz = DE(position + vec4(0, 0,e,0)) - n;
+    vec4 grad = vec4(dx, dy, dz, 0);
+    return normalize(grad);
+}
+
+vec4 rayMarch (inout vec4 position, vec4 direction){
 
     float minimumDistance = 0.0001; //temp values
-    float maxMarches = 1000;
+    float maxMarches = 4000;
 
     float totalDistance = 0;
     float dist = 0.0;
@@ -63,8 +76,6 @@ float rayMarch (inout vec4 position, vec4 direction){
     for(float i = 0; i < maxMarches; i += 1.0){
 
         dist = DE(position);
-
-        //dist = random2(texCoord).x;
 
         if(dist < minimumDistance){
 
@@ -76,20 +87,29 @@ float rayMarch (inout vec4 position, vec4 direction){
         position += direction * dist;
 
     }
-    return totalDistance;
+
+    return totalDistance*20*calculateNormal(position);
 }
+
 
 void main(void)
 {
-	if (displayGPUversion == 1)
-	{
-        vec4 camera = vec4(0.0, 0.0, -1.0, 0.0);
+
+	    mat4 inMat = projectionMatrix*viewMatrix*mat;
+        /*
+	    vec4 ray = normalize(vec4(0.0, 0.0, -10.0, 0.0));
+	    ray = inMat * ray;
+
+	    vec4 position = inMat[3];
+
+	    float col = rayMarch(position, ray);
+	    */
+        vec4 camera = vec4(texCoord.x + 3.0, texCoord.y +1.0, 2.0, 1.0);
+        camera =  viewMatrix * camera;
 		vec4 position = vec4(texCoord, 0.0, 0.0);
-		float b = rayMarch(position, position - camera);
-		out_Color = position * b * 20;
+		vec4 col = rayMarch(position, position - camera);
+		out_Color = col;
 
 
-	}
-	else
-		out_Color = texture(tex, texCoord);
+
 }
