@@ -11,6 +11,7 @@ uniform sampler2D tex;
 
 uniform int displayGPUversion;
 uniform float ringDensity;
+uniform int iterations;
 
 
 vec2 random2(vec2 st)

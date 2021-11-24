@@ -13,6 +13,7 @@
 #define kTextureSize 512
 GLubyte ptex[kTextureSize][kTextureSize][3];
 const float ringDensity = 20.0;
+int iterations = 15;
 
 // Example: Radial pattern.
 void maketexture()
@@ -46,12 +47,12 @@ void maketexture()
 
 // Globals
 // Data would normally be read from files
-GLfloat vertices[] = { -1.0f,-1.0f,0.0f,
-						-1.0f,1.0f,0.0f,
-						1.0f,1.0f,0.0f,
-						-1.0f,-1.0f,0.0f,
-						1.0f,1.0f,0.0f,
-						1.0f,-1.0f,0.0f };
+GLfloat vertices[] = { -1.0f,-1.0f,0.0f,1.0f,
+						-1.0f,1.0f,0.0f,1.0f,
+						1.0f,1.0f,0.0f,1.0f,
+						-1.0f,-1.0f,0.0f,1.0f,
+						1.0f,1.0f,0.0f,1.0f,
+						1.0f,-1.0f,0.0f,1.0f };
 GLfloat texCoords[] = { 0.0f,0.0f,
 						0.0f,1.0f,
 						1.0f,1.0f,
@@ -96,8 +97,8 @@ void init(void)
 
 	// VBO for vertex data
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjID);
-	glBufferData(GL_ARRAY_BUFFER, 18*sizeof(GLfloat), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(glGetAttribLocation(program, "in_Position"), 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBufferData(GL_ARRAY_BUFFER, 24*sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(glGetAttribLocation(program, "in_Position"), 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(glGetAttribLocation(program, "in_Position"));
 
 	// VBO for texture
@@ -112,6 +113,7 @@ void init(void)
 // Constants common to CPU and GPU
 	glUniform1i(glGetUniformLocation(program, "displayGPUversion"), 0); // shader generation off
 	glUniform1f(glGetUniformLocation(program, "ringDensity"), ringDensity);
+	glUniform1i(glGetUniformLocation(program, "iterations"), iterations);
 
 	maketexture();
 
@@ -144,10 +146,12 @@ void display(void)
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    iterations++;
+    glUniform1i(glGetUniformLocation(program, "iterations"), iterations);
 	glBindVertexArray(vertexArrayObjID);	// Select VAO
 	glDrawArrays(GL_TRIANGLES, 0, 6);	// draw object
-
 	printError("display");
+    printf("%d", iterations);
 
 	glutSwapBuffers();
 }
@@ -160,6 +164,7 @@ int main(int argc, char *argv[])
 	glutCreateWindow ("Lab 1");
 	glutDisplayFunc(display);
 	glutKeyboardFunc(key);
+	//glutRepeatingTimer(1000);
 	init ();
 	glutMainLoop();
 }
