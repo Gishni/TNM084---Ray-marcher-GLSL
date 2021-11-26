@@ -54,6 +54,11 @@ float DE(vec4 pos){
     return 0.5*log(r)*r/dr;
 }
 
+float sphereDE(vec4 pos){
+    float radius = 1.0;
+    return length(pos.xyz) - radius;
+
+}
 //TAKEN FROM http://celarek.at/wp/wp-content/uploads/2014/05/realTimeFractalsReport.pdf
 vec4 calculateNormal (vec4 position){
     float e = 0.0000001;
@@ -75,7 +80,7 @@ vec4 rayMarch (inout vec4 position, vec4 direction){
 
     for(float i = 0; i < maxMarches; i += 1.0){
 
-        dist = DE(position);
+        dist = sphereDE(position);
 
         if(dist < minimumDistance){
 

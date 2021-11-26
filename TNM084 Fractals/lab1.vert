@@ -10,5 +10,5 @@ out vec2 texCoord;
 void main(void)
 {
 	texCoord = in_TexCoord;
-	gl_Position =  /*projectionMatrix*viewMatrix* */in_Position;
+	gl_Position =  in_Position;
 }
