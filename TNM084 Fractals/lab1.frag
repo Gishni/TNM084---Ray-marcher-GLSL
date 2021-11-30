@@ -23,7 +23,7 @@ vec2 random2(vec2 st)
 }
 
 //code from http://blog.hvidtfeldts.net/index.php/2011/09/distance-estimated-3d-fractals-v-the-mandelbulb-different-de-approximations/
-float DE(vec4 pos){
+float DE(vec4 pos, inout int gen){
     int iter = 15; //temp values
     float power = 8.0;
 
@@ -49,51 +49,69 @@ float DE(vec4 pos){
         //cartesian coords
         z = zr * vec4(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta), 0.0);
         z+=pos;
+        if(0.5*log(r)*r/dr < 0.00001){
+            gen = i;
+        }
 
     }
     return 0.5*log(r)*r/dr;
 }
 
-float sphereDE(vec4 pos){
-    float radius = 1.0;
+float sphereDE(vec4 pos){ //infinite amount of balls :)
+    float radius = 0.2;
+    pos.xyz = mod(pos.xyz, 1.0) - vec3(0.5);
     return length(pos.xyz) - radius;
 
 }
+/*
 //TAKEN FROM http://celarek.at/wp/wp-content/uploads/2014/05/realTimeFractalsReport.pdf
 vec4 calculateNormal (vec4 position){
     float e = 0.0000001;
-    float n = DE(position);
-    float dx = DE(position + vec4(e, 0,0,0)) - n;
-    float dy = DE(position + vec4(0, e,0,0)) - n;
-    float dz = DE(position + vec4(0, 0,e,0)) - n;
+    float n = sphereDE(position);
+    float dx = DE(position + vec4(e, 0,0,0.0)) - n;
+    float dy = DE(position + vec4(0, e,0,0.0)) - n;
+    float dz = DE(position + vec4(0, 0,e,0.0)) - n;
     vec4 grad = vec4(dx, dy, dz, 0);
     return normalize(grad);
 }
+*/
+//https://www.iquilezles.org/www/articles/normalsSDF/normalsSDF.htm
+vec3 calcNormal(vec4 p) {
+    float h = 0.0001;
+	const vec3 k = vec3(1,-1,0);
+	return normalize(k.xyy*sphereDE(p + k.xyyz*h) +
+					 k.yyx*sphereDE(p + k.yyxz*h) +
+					 k.yxy*sphereDE(p + k.yxyz*h) +
+					 k.xxx*sphereDE(p + k.xxxz*h));
+}
+
+
 
 vec4 rayMarch (inout vec4 position, vec4 direction){
 
-    float minimumDistance = 0.0001; //temp values
-    float maxMarches = 4000;
+    float minimumDistance = 0.00001; //temp values
+    int maxMarches = 4000;
 
     float totalDistance = 0;
     float dist = 0.0;
+    int gen = 0;
+    for(int i = 0; i < maxMarches; i++){
 
-    for(float i = 0; i < maxMarches; i += 1.0){
-
+        //dist = DE(position, gen);
         dist = sphereDE(position);
-
         if(dist < minimumDistance){
-
+            //return vec4(1.0,0.0,0.0,0.0);
             break;
         }
 
         totalDistance += dist;
 
-        position += direction * dist;
+        position += normalize(direction) * dist;
 
     }
+    return vec4(calcNormal(position),0);
+    //return vec4(vec2(gen/15.0),0.0,0.0); //MANDELBULB
 
-    return totalDistance*20*calculateNormal(position);
 }
 
 
@@ -109,10 +127,11 @@ void main(void)
 
 	    float col = rayMarch(position, ray);
 	    */
-        vec4 camera = vec4(texCoord.x + 3.0, texCoord.y +1.0, 2.0, 1.0);
+        vec4 camera = vec4(0.0,0.0, -3.0, 0.0);
         camera =  viewMatrix * camera;
-		vec4 position = vec4(texCoord, 0.0, 0.0);
-		vec4 col = rayMarch(position, position - camera);
+		vec4 position = vec4(texCoord - vec2(0.5), -2.0, 0.0);
+		position = viewMatrix * position;
+		vec4 col = rayMarch(camera, position - camera);
 		out_Color = col;
 
 

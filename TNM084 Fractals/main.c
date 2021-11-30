@@ -13,7 +13,7 @@
 #define kTextureSize 512
 GLubyte ptex[kTextureSize][kTextureSize][3];
 const float ringDensity = 20.0;
-int iterations = 15;
+int iterations = 0;
 
 // Example: Radial pattern.
 void maketexture()
