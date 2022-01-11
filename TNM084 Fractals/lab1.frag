@@ -21,12 +21,13 @@ vec2 random2(vec2 st)
               dot(st,vec2(269.5,183.3)) );
     return -1.0 + 2.0*fract(sin(st)*43758.5453123);
 }
-//http://blog.hvidtfeldts.net/index.php/2011/08/distance-estimated-3d-fractals-iii-folding-space/
+//inspired by http://blog.hvidtfeldts.net/index.php/2011/08/distance-estimated-3d-fractals-iii-folding-space/
 float foldDE(vec3 z){
      int n = 0;
-    int iter = 10;
+    int iter = 1;
     while (n < iter){
-        if(z.x + z.y < 0){
+       //TETRAHED FOLD
+       if(z.x + z.y < 0){
             z.xy = -z.yx;
         }
         if(z.x + z.z < 0){
@@ -35,7 +36,17 @@ float foldDE(vec3 z){
         if(z.z + z.y < 0){
             z.zy = -z.yz;
         }
-        z = z*2.0+ - 1.0*(2.0 - 1.0);
+        //SQUARE FOLD
+        if(z.z < 0){
+            z.z = -z.z;
+        }
+         if(z.y < 0){
+            z.y = -z.y;
+        }
+         if(z.x < 0){
+            z.x = -z.x;
+        }
+        z = z*2.0+ - 0.8*(2.0 - 1.0);
         n++;
     }
     return (length(z)) *  pow(2.0, - float(n));
