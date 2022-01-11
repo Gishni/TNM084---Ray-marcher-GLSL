@@ -2,14 +2,14 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="..\common-windows\common\Windows\MicroGlut.c" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="lab1.frag" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="17697" topLine="631" />
+			<Cursor1 position="2112" topLine="103" />
 		</Cursor>
 	</File>
-	<File name="..\common-windows\common\Windows\glew.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="..\common-windows\common\VectorUtils3.c" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="94678" topLine="1911" />
+			<Cursor1 position="23432" topLine="827" />
 		</Cursor>
 	</File>
 	<File name="..\common-windows\common\LittleOBJLoader.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -17,19 +17,24 @@
 			<Cursor1 position="11396" topLine="444" />
 		</Cursor>
 	</File>
-	<File name="main.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="..\common-windows\common\LoadTGA.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1384" topLine="135" />
+			<Cursor1 position="9494" topLine="196" />
+		</Cursor>
+	</File>
+	<File name="main.c" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5314" topLine="133" />
+		</Cursor>
+	</File>
+	<File name="..\common-windows\common\Windows\MicroGlut.c" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="17697" topLine="631" />
 		</Cursor>
 	</File>
 	<File name="..\common-windows\common\GL_utilities.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="1269" topLine="404" />
-		</Cursor>
-	</File>
-	<File name="..\common-windows\common\VectorUtils3.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="23432" topLine="827" />
 		</Cursor>
 	</File>
 	<File name="..\common-windows\common\Windows\glew.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -42,14 +47,9 @@
 			<Cursor1 position="229" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="lab1.frag" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="..\common-windows\common\Windows\glew.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2913" topLine="91" />
-		</Cursor>
-	</File>
-	<File name="..\common-windows\common\LoadTGA.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="9494" topLine="196" />
+			<Cursor1 position="94678" topLine="1911" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

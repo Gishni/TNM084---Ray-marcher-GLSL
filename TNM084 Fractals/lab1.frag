@@ -21,6 +21,25 @@ vec2 random2(vec2 st)
               dot(st,vec2(269.5,183.3)) );
     return -1.0 + 2.0*fract(sin(st)*43758.5453123);
 }
+//http://blog.hvidtfeldts.net/index.php/2011/08/distance-estimated-3d-fractals-iii-folding-space/
+float foldDE(vec3 z){
+     int n = 0;
+    int iter = 10;
+    while (n < iter){
+        if(z.x + z.y < 0){
+            z.xy = -z.yx;
+        }
+        if(z.x + z.z < 0){
+            z.xz = -z.zx;
+        }
+        if(z.z + z.y < 0){
+            z.zy = -z.yz;
+        }
+        z = z*2.0+ - 1.0*(2.0 - 1.0);
+        n++;
+    }
+    return (length(z)) *  pow(2.0, - float(n));
+}
 
 //code from http://blog.hvidtfeldts.net/index.php/2011/09/distance-estimated-3d-fractals-v-the-mandelbulb-different-de-approximations/
 float DE(vec4 pos, inout int gen){
@@ -57,24 +76,14 @@ float DE(vec4 pos, inout int gen){
     return 0.5*log(r)*r/dr;
 }
 
-float sphereDE(vec4 pos){ //infinite amount of balls :)
+float sphereDE(vec4 pos){
     float radius = 0.2;
-    pos.xyz = mod(pos.xyz, 1.0) - vec3(0.5);
-    return length(pos.xyz) - radius;
+    //pos.xyz = mod(pos.xyz, 1.0) - vec3(0.5);
+    //return length(pos.xyz) - radius;
+    return (foldDE(pos.xyz) - radius);
 
 }
-/*
-//TAKEN FROM http://celarek.at/wp/wp-content/uploads/2014/05/realTimeFractalsReport.pdf
-vec4 calculateNormal (vec4 position){
-    float e = 0.0000001;
-    float n = sphereDE(position);
-    float dx = DE(position + vec4(e, 0,0,0.0)) - n;
-    float dy = DE(position + vec4(0, e,0,0.0)) - n;
-    float dz = DE(position + vec4(0, 0,e,0.0)) - n;
-    vec4 grad = vec4(dx, dy, dz, 0);
-    return normalize(grad);
-}
-*/
+
 //https://www.iquilezles.org/www/articles/normalsSDF/normalsSDF.htm
 vec3 calcNormal(vec4 p) {
     float h = 0.0001;
@@ -109,6 +118,7 @@ vec4 rayMarch (inout vec4 position, vec4 direction){
         position += normalize(direction) * dist;
 
     }
+    //return vec4(dist * position);
     return vec4(calcNormal(position),0);
     //return vec4(vec2(gen/15.0),0.0,0.0); //MANDELBULB
 

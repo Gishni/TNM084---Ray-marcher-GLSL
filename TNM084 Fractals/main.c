@@ -193,37 +193,16 @@ void keys(unsigned char key, int x, int y)
 			forward = ScalarMult(normalize(forward), 4.0);
 			break;
 
-        case'w':
-            campos = VectorAdd(campos, ScalarMult(forward, 0.1));
-            break;
 
         case'a':
             forward = MultMat3Vec3(mat4tomat3(Ry(0.05)), forward);
             break;
 
-        case's':
-            campos = VectorSub(campos, ScalarMult(forward, 0.1));
-            break;
 
         case'd':
             forward = MultMat3Vec3(mat4tomat3(Ry(-0.05)), forward);
             break;
 
-        case'q':
-            campos = VectorSub(campos, ScalarMult(CrossProduct(forward, SetVector(0,1,0)), 0.05));
-            break;
-
-        case'e':
-            campos = VectorAdd(campos, ScalarMult(CrossProduct(forward, SetVector(0,1,0)), 0.05));
-            break;
-
-        case'z':
-            campos = VectorAdd(campos, ScalarMult(SetVector(0,1,0), 0.01));
-            break;
-
-        case'c':
-            campos = VectorSub(campos, ScalarMult(SetVector(0,1,0), 0.01));
-            break;
 
 	}
 	glutPostRedisplay();
