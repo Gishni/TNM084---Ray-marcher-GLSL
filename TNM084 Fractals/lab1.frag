@@ -5,13 +5,18 @@
 
 #version 150
 
+
+//CODE BASE FROM LABORATION 1 IN THE COURSE TNM084 AT LINKÖPING UNIVERSITY WRITTEN BY INGEMAR RAGNEMALM
+
+//Author Max Benecke maxbe682
+
 out vec4 out_Color;
 in vec2 texCoord;
 uniform sampler2D tex;
 
 uniform int displayGPUversion;
 uniform int iterations;
-uniform mat4 mat;
+uniform float zmove;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
@@ -36,7 +41,7 @@ float foldDE(vec3 z){
         if(z.z + z.y < 0){
             z.zy = -z.yz;
         }
-        //SQUARE FOLD
+        //cube FOLD
         if(z.z < 0){
             z.z = -z.z;
         }
@@ -89,7 +94,7 @@ float DE(vec4 pos, inout int gen){
 
 float sphereDE(vec4 pos){
     float radius = 0.2;
-    //pos.xyz = mod(pos.xyz, 1.0) - vec3(0.5);
+    //pos.xyz = mod(pos.xyz, 1.0) - vec3(0.5); //infinite amount of spheres
     //return length(pos.xyz) - radius;
     return (foldDE(pos.xyz) - radius);
 
@@ -105,11 +110,22 @@ vec3 calcNormal(vec4 p) {
 					 k.xxx*sphereDE(p + k.xxxz*h));
 }
 
+//normals for the mandelbulb, same code as above just using the mandel DE.
+vec3 calcNormalMandel(vec4 p) {
+    float h = 0.0001;
+    int g = 0;
+	const vec3 k = vec3(1,-1,0);
+	return normalize(k.xyy*DE(p + k.xyyz*h, g) +
+					 k.yyx*DE(p + k.yyxz*h ,g ) +
+					 k.yxy*DE(p + k.yxyz*h, g) +
+					 k.xxx*DE(p + k.xxxz*h, g));
+}
+
 
 
 vec4 rayMarch (inout vec4 position, vec4 direction){
 
-    float minimumDistance = 0.00001; //temp values
+    float minimumDistance = 0.00001;
     int maxMarches = 4000;
 
     float totalDistance = 0;
@@ -117,42 +133,32 @@ vec4 rayMarch (inout vec4 position, vec4 direction){
     int gen = 0;
     for(int i = 0; i < maxMarches; i++){
 
-        //dist = DE(position, gen);
-        dist = sphereDE(position);
+        dist = DE(position, gen); //the two diffrent DE settings one for sphere and one for the bulb
+        //dist = sphereDE(position);
         if(dist < minimumDistance){
-            //return vec4(1.0,0.0,0.0,0.0);
             break;
         }
 
         totalDistance += dist;
 
-        position += normalize(direction) * dist;
+        position += normalize(direction) * dist; // update position
 
     }
-    //return vec4(dist * position);
-    return vec4(calcNormal(position),0);
-    //return vec4(vec2(gen/15.0),0.0,0.0); //MANDELBULB
-
+    //return vec4(0.5 * (length(position) + 0.001), 0.0, 0.0, 0.0); //color by distance to origin
+    //return vec4(calcNormal(position),0); // normal sphere
+    //return vec4(calcNormalMandel(position),0); //normal mandel
+    return vec4((gen/15.0), 0.0,0.0,0.0);//Escape time algorithm
+    //return vec4(random2(vec2(gen)), 0.0 , 0.0); //escape time algorithm with random color
 }
 
 
 void main(void)
 {
-
-	    mat4 inMat = projectionMatrix*viewMatrix*mat;
-        /*
-	    vec4 ray = normalize(vec4(0.0, 0.0, -10.0, 0.0));
-	    ray = inMat * ray;
-
-	    vec4 position = inMat[3];
-
-	    float col = rayMarch(position, ray);
-	    */
-        vec4 camera = vec4(0.0,0.0, -3.0, 0.0);
+        vec4 camera = vec4(0.0,0.0, -3.0 + zmove, 0.0);
         camera =  viewMatrix * camera;
-		vec4 position = vec4(texCoord - vec2(0.5), -2.0, 0.0);
-		position = viewMatrix * position;
-		vec4 col = rayMarch(camera, position - camera);
+		vec4 position = vec4(texCoord - vec2(0.5), -2.0 + zmove, 0.0);
+		position = viewMatrix * position; // roation of camera around object
+		vec4 col = rayMarch(camera, position - camera); // send the ray from the camera through the specified position on the view plane
 		out_Color = col;
 
 

@@ -11,6 +11,11 @@
 
 
 #define kTextureSize 512
+
+//CODE BASE FROM LABORATION 1 IN THE COURSE TNM084 AT LINKÖPING UNIVERSITY WRITTEN BY INGEMAR RAGNEMALM
+
+//Author Max Benecke maxbe682
+
 GLubyte ptex[kTextureSize][kTextureSize][3];
 const float ringDensity = 20.0;
 int iterations = 0;
@@ -158,10 +163,12 @@ GLfloat a = 0.0;
 vec3 campos = {0, 1.5, 10};
 vec3 forward = {0, 0, -4};
 vec3 up = {0, 1, 0};
+float zmove = 0;
 
 void display(void)
 {
 	printError("pre display");
+
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -176,26 +183,30 @@ void display(void)
 
     iterations++;
     glUniform1i(glGetUniformLocation(program, "iterations"), iterations);
+    glUniform1f(glGetUniformLocation(program, "zmove"), zmove);
 	glBindVertexArray(vertexArrayObjID);	// Select VAO
 	glDrawArrays(GL_TRIANGLES, 0, 6);	// draw object
+
 	printError("display");
 
 	glutSwapBuffers();
 }
-
 // Switch on any key
 void keys(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
-		case ' ':
-			forward.y = 0;
-			forward = ScalarMult(normalize(forward), 4.0);
+		case 'w':
+			zmove += 0.01; //zoom in
+			break;
+
+        case 's':
+			zmove -= 0.01; //zoom out
 			break;
 
 
         case'a':
-            forward = MultMat3Vec3(mat4tomat3(Ry(0.05)), forward);
+            forward = MultMat3Vec3(mat4tomat3(Ry(0.05)), forward); //rotation
             break;
 
 
@@ -216,7 +227,6 @@ int main(int argc, char *argv[])
 	glutCreateWindow ("Lab 1");
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keys);
-	//glutRepeatingTimer(1000);
 	init ();
 	glutMainLoop();
 }
